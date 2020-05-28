@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Тимур К](https://up.htmlacademy.ru/javascript/20/user/561605).
-* Наставник: `Неизвестно`.
+* Наставник: `Кексобот`.
 
 ---
 
