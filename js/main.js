@@ -25,7 +25,7 @@ var getRandomElement = function(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 var shuffleArray = function(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  return arr.sort(function() { return Math.random() - 0.5 });
 };
 var generateRandomLengthArray = function(arr, randomLength) {
   var newArr = [];
@@ -46,7 +46,7 @@ var generateNumberArray = function(startNum, endNum) {
 var generateAdvert = function(id) {
   var advert = {
     "author": {
-        "avatar": `img/avatars/user0${id}.png`
+        "avatar": "img/avatars/user0" + id + ".png"
     },
     "offer": {
         "title": getRandomElement(TITLES),
@@ -71,11 +71,11 @@ var generateAdvert = function(id) {
 
 // Create pin
 var createPin = function(advert) {
-  let btn = document.querySelector("#pin")
+  var btn = document.querySelector("#pin")
     .content
     .querySelector("button")
     .cloneNode(true);
-  let avatar = btn.querySelector("img");
+  var avatar = btn.querySelector("img");
   btn.style.left = advert.location.x + "px";
   btn.style.top = advert.location.y + "px";
   avatar.src = advert.author.avatar;
@@ -90,7 +90,7 @@ var mapPins = document.querySelector(".map__pins");
 var adverts = [];
 var fragment = document.createDocumentFragment();
 
-for (let i = 0; i < 8; i++) {
+for (var i = 0; i < 8; i++) {
   adverts.push(generateAdvert([i + 1]));
 }
 
@@ -100,9 +100,6 @@ adverts.forEach(function (el) {
 });
 
 mapPins.appendChild(fragment);
-
-map.classList.remove("map--faded");
-
 
 //// create mock cards
 var map = document.querySelector(".map");
@@ -127,7 +124,7 @@ var createCard = function(advert) {
 
   title.textContent = advert.offer.title;
   address.textContent = advert.offer.address;
-  price.textContent = `${advert.offer.price}₽/ночь`;
+  price.textContent = advert.offer.price + "₽/ночь";
   switch (advert.offer.type) {
     case "flat":
       type.textContent = "Квартира";
@@ -142,8 +139,8 @@ var createCard = function(advert) {
       type.textContent = "Дворец";
       break;
   }
-  capacity.textContent = `${advert.offer.rooms} комнаты для ${advert.offer.guests} гостей`;
-  time.textContent = `Заезд после ${advert.offer.checkin}, выезд до ${advert.offer.checkout}`;
+  capacity.textContent = advert.offer.rooms + " комнаты для " + advert.offer.guests + " гостей";
+  time.textContent = "Заезд после " + advert.offer.checkin + ", выезд до " + advert.offer.checkout;
   utilities.textContent = advert.offer.features.join(", ");
   description.textContent = advert.offer.description;
   avatar.src = advert.author.avatar;
@@ -159,8 +156,17 @@ var createCard = function(advert) {
 
 var card = createCard(adverts[0]);
 
-cardFrag.appendChild(card);
+// cardFrag.appendChild(card);
 
-map.insertBefore(cardFrag, mapFilters);
+// map.insertBefore(cardFrag, mapFilters);
+
+// 4 глава Обработка событий
+
+var form = document.querySelector(".ad-form");
+var fieldsets = form.children;
+
+for (var i = 0; i < fieldsets.length; i++) {
+  fieldsets[i].disabled = true;
+}
 
 })();
