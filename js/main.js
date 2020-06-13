@@ -99,7 +99,7 @@ adverts.forEach(function (el) {
   fragment.appendChild(pin);
 });
 
-mapPins.appendChild(fragment);
+// mapPins.appendChild(fragment);
 
 //// create mock cards
 var map = document.querySelector(".map");
@@ -154,19 +154,112 @@ var createCard = function(advert) {
   return card;
 };
 
-var card = createCard(adverts[0]);
+// var card = createCard(adverts[0]);
 
 // cardFrag.appendChild(card);
 
 // map.insertBefore(cardFrag, mapFilters);
 
+
+
 // 4 глава Обработка событий
 
-var form = document.querySelector(".ad-form");
-var fieldsets = form.children;
+var adForm = document.querySelector(".ad-form");
+var adFieldsets = adForm.children;
+var filtersForm = document.querySelector(".map__filters");
+var filters = filtersForm.children;
 
-for (var i = 0; i < fieldsets.length; i++) {
-  fieldsets[i].disabled = true;
+// отключение всех филдсетов в ad-form
+for (var i = 0; i < adFieldsets.length; i++) {
+  adFieldsets[i].disabled = true;
 }
+
+// отключение всех инпутов в фильтрах
+for (var i = 0; i < filters.length; i++) {
+  filters[i].disabled = true;
+}
+
+// value адреса в неактивном состоянии
+var mainPin = document.querySelector(".map__pin--main");
+var address = document.querySelector("#address");
+
+// первоначальное значение address, когда кнопка круглая
+address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
+
+// активация страницы
+
+var onMainPinClick = function(evt) {
+  map.classList.remove("map--faded");
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].disabled = false;
+  }
+  for (var i = 0; i < adFieldsets.length; i++) {
+    adFieldsets[i].disabled = false;
+  }
+  adForm.classList.remove("ad-form--disabled");
+  // перенос адреса на остреё пина
+  address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight + 22);
+}
+
+// слушатели главного пина
+mainPin.addEventListener("mousedown", function(evt) {
+  if (evt.button !== 0) return;
+  onMainPinClick(evt);
+});
+
+mainPin.addEventListener("keydown", function(evt) {
+  if (evt.keyCode !== 13) return;
+  onMainPinClick(evt);
+});
+
+// валидация соответствия количества комнат количеству гостей
+var roomNumber = document.querySelector("#room_number");
+var capacity = document.querySelector("#capacity");
+
+var enableCapacityOptions = function() {
+  var capacityOptions = document.querySelectorAll("#capacity option");
+  capacityOptions.forEach(function(el) {
+    el.disabled = false;
+  })
+}
+
+roomNumber.addEventListener("change", function(evt) {
+  enableCapacityOptions();
+  var roomsValue = evt.target.value;
+  var capacityOptions = capacity.querySelectorAll("option");
+  var oneGuestCapacity = capacity.querySelector("option[value='1']");
+  capacityOptions.forEach(function(el) {
+    if (roomsValue == "100") {
+      if (el.value == "0") {
+        el.selected = true;
+        return;
+      }
+      el.disabled = true;
+
+
+    } else if (roomsValue == "1") {
+      if (el.value == "1") {
+        oneGuestCapacity.selected = true;
+        return;
+      }
+      el.disabled = true;
+
+    } else if (roomsValue == "2") {
+      if (el.value == "1" || el.value == "2") {
+        oneGuestCapacity.selected = true;
+        return;
+      }
+      el.disabled = true;
+
+
+    } else if (roomsValue == "3") {
+      if (el.value == "1" || el.value == "2" || el.value == "3") {
+        oneGuestCapacity.selected = true;
+        return;
+      }
+      el.disabled = true;
+    }
+  });
+});
 
 })();
