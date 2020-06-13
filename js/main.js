@@ -25,7 +25,7 @@ var getRandomElement = function(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 var shuffleArray = function(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+  return arr.sort(function() { return Math.random() - 0.5 });
 };
 var generateRandomLengthArray = function(arr, randomLength) {
   var newArr = [];
@@ -46,7 +46,7 @@ var generateNumberArray = function(startNum, endNum) {
 var generateAdvert = function(id) {
   var advert = {
     "author": {
-        "avatar": `img/avatars/user0${id}.png`
+        "avatar": "img/avatars/user0" + id + ".png"
     },
     "offer": {
         "title": getRandomElement(TITLES),
@@ -71,11 +71,11 @@ var generateAdvert = function(id) {
 
 // Create pin
 var createPin = function(advert) {
-  let btn = document.querySelector("#pin")
+  var btn = document.querySelector("#pin")
     .content
     .querySelector("button")
     .cloneNode(true);
-  let avatar = btn.querySelector("img");
+  var avatar = btn.querySelector("img");
   btn.style.left = advert.location.x + "px";
   btn.style.top = advert.location.y + "px";
   avatar.src = advert.author.avatar;
@@ -90,7 +90,7 @@ var mapPins = document.querySelector(".map__pins");
 var adverts = [];
 var fragment = document.createDocumentFragment();
 
-for (let i = 0; i < 8; i++) {
+for (var i = 0; i < 8; i++) {
   adverts.push(generateAdvert([i + 1]));
 }
 
@@ -99,10 +99,7 @@ adverts.forEach(function (el) {
   fragment.appendChild(pin);
 });
 
-mapPins.appendChild(fragment);
-
-map.classList.remove("map--faded");
-
+// mapPins.appendChild(fragment);
 
 //// create mock cards
 var map = document.querySelector(".map");
@@ -127,7 +124,7 @@ var createCard = function(advert) {
 
   title.textContent = advert.offer.title;
   address.textContent = advert.offer.address;
-  price.textContent = `${advert.offer.price}₽/ночь`;
+  price.textContent = advert.offer.price + "₽/ночь";
   switch (advert.offer.type) {
     case "flat":
       type.textContent = "Квартира";
@@ -142,8 +139,8 @@ var createCard = function(advert) {
       type.textContent = "Дворец";
       break;
   }
-  capacity.textContent = `${advert.offer.rooms} комнаты для ${advert.offer.guests} гостей`;
-  time.textContent = `Заезд после ${advert.offer.checkin}, выезд до ${advert.offer.checkout}`;
+  capacity.textContent = advert.offer.rooms + " комнаты для " + advert.offer.guests + " гостей";
+  time.textContent = "Заезд после " + advert.offer.checkin + ", выезд до " + advert.offer.checkout;
   utilities.textContent = advert.offer.features.join(", ");
   description.textContent = advert.offer.description;
   avatar.src = advert.author.avatar;
@@ -157,10 +154,112 @@ var createCard = function(advert) {
   return card;
 };
 
-var card = createCard(adverts[0]);
+// var card = createCard(adverts[0]);
 
-cardFrag.appendChild(card);
+// cardFrag.appendChild(card);
 
-map.insertBefore(cardFrag, mapFilters);
+// map.insertBefore(cardFrag, mapFilters);
+
+
+
+// 4 глава Обработка событий
+
+var adForm = document.querySelector(".ad-form");
+var adFieldsets = adForm.children;
+var filtersForm = document.querySelector(".map__filters");
+var filters = filtersForm.children;
+
+// отключение всех филдсетов в ad-form
+for (var i = 0; i < adFieldsets.length; i++) {
+  adFieldsets[i].disabled = true;
+}
+
+// отключение всех инпутов в фильтрах
+for (var i = 0; i < filters.length; i++) {
+  filters[i].disabled = true;
+}
+
+// value адреса в неактивном состоянии
+var mainPin = document.querySelector(".map__pin--main");
+var address = document.querySelector("#address");
+
+// первоначальное значение address, когда кнопка круглая
+address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
+
+// активация страницы
+
+var onMainPinClick = function(evt) {
+  map.classList.remove("map--faded");
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].disabled = false;
+  }
+  for (var i = 0; i < adFieldsets.length; i++) {
+    adFieldsets[i].disabled = false;
+  }
+  adForm.classList.remove("ad-form--disabled");
+  // перенос адреса на остреё пина
+  address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight + 22);
+}
+
+// слушатели главного пина
+mainPin.addEventListener("mousedown", function(evt) {
+  if (evt.button !== 0) return;
+  onMainPinClick(evt);
+});
+
+mainPin.addEventListener("keydown", function(evt) {
+  if (evt.keyCode !== 13) return;
+  onMainPinClick(evt);
+});
+
+// валидация соответствия количества комнат количеству гостей
+var roomNumber = document.querySelector("#room_number");
+var capacity = document.querySelector("#capacity");
+
+var enableCapacityOptions = function() {
+  var capacityOptions = document.querySelectorAll("#capacity option");
+  capacityOptions.forEach(function(el) {
+    el.disabled = false;
+  })
+}
+
+roomNumber.addEventListener("change", function(evt) {
+  enableCapacityOptions();
+  var roomsValue = evt.target.value;
+  var capacityOptions = capacity.querySelectorAll("option");
+  var oneGuestCapacity = capacity.querySelector("option[value='1']");
+  capacityOptions.forEach(function(el) {
+    if (roomsValue == "100") {
+      if (el.value == "0") {
+        el.selected = true;
+        return;
+      }
+      el.disabled = true;
+
+
+    } else if (roomsValue == "1") {
+      if (el.value == "1") {
+        oneGuestCapacity.selected = true;
+        return;
+      }
+      el.disabled = true;
+
+    } else if (roomsValue == "2") {
+      if (el.value == "1" || el.value == "2") {
+        oneGuestCapacity.selected = true;
+        return;
+      }
+      el.disabled = true;
+
+
+    } else if (roomsValue == "3") {
+      if (el.value == "1" || el.value == "2" || el.value == "3") {
+        oneGuestCapacity.selected = true;
+        return;
+      }
+      el.disabled = true;
+    }
+  });
+});
 
 })();
