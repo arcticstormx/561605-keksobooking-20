@@ -26,19 +26,19 @@ var MAP_PIN_HEIGHT = 70;
 // UTILITY Functions
 
 // generate a random number width specified minimum and maximum limits
-var generateRandomNumber = function(min, max) {
+  function generateRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 // get random element from a specified array
-var getRandomElement = function(arr) {
+  function getRandomElement(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 // shuffle a specified array
-var shuffleArray = function(arr) {
+  function shuffleArray(arr) {
   return arr.sort(function() { return Math.random() - 0.5 });
 };
 // generate array with specified length from random elements of a specified array
-var generateRandomLengthArray = function(arr, randomLength) {
+  function generateRandomLengthArray(arr, randomLength) {
   var newArr = [];
   for (var i = 0; i < randomLength - 1; i++) {
     newArr.push(getRandomElement(arr));
@@ -46,7 +46,7 @@ var generateRandomLengthArray = function(arr, randomLength) {
   return newArr;
 };
 // generate array with number sequence as elements
-var generateNumberArray = function(startNum, endNum) {
+  function generateNumberArray(startNum, endNum) {
   var arr = [];
   for (var i = 0; i <= endNum; i++) {
     arr.push(i);
@@ -54,7 +54,9 @@ var generateNumberArray = function(startNum, endNum) {
   return arr;
 };
 
-// Create adverts and pins
+// MODULES
+
+// create and render adverts and pins
 var renderPins = function() {
   // EXECUTED CODE
 
@@ -191,8 +193,6 @@ var renderPins = function() {
   }
 }
 
-
-// 4 глава Обработка событий
 // change page settings at start
 var startupSettings = function() {
   var adForm = document.querySelector(".ad-form");
@@ -251,6 +251,7 @@ var startupSettings = function() {
 
 startupSettings();
 
+// validate that guests number conforms to rooms capacity
 var roomsToCapacityValidation = function() {
   // валидация соответствия количества комнат количеству гостей
 
@@ -306,7 +307,7 @@ var roomsToCapacityValidation = function() {
 
 roomsToCapacityValidation();
 
-// Открытие любой карточки по клику
+// open
 
 
 })();
