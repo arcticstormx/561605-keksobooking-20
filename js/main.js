@@ -119,6 +119,24 @@ var renderPins = function() {
     avatar.alt = advert.offer.title;
     return btn;
   };
+  // click handler for map pins (not Main Pin)
+  function onMapPinClick(evt) {
+    // 1. find pin's advert
+    var pinAvatarSrc = this.querySelector("img").src;
+    // edit src into "user##" format where "##" are numbers
+    var pinUserId = pinAvatarSrc.match(/user\w+(?=.png)/)[0];
+    // find an advert with the same user id as pin's
+    var pinAdvert = adverts.find(function(item) {
+      var advertUserId = item.author.avatar.match(/user\w+(?=.png)/)[0];
+      return advertUserId === pinUserId;
+    });
+    // 2. create pin's card DOM element
+    var card = createCard(pinAdvert);
+    // 3. render pin's card DOM element
+    renderCard(card);
+    console.log(card);
+  }
+
   // render map pins DOM elements on map from array
   function renderMapPins(arr) {
     var fragment = document.createDocumentFragment();
@@ -126,6 +144,9 @@ var renderPins = function() {
     arr.forEach(function (el) {
       // create pin DOM element with object data
       var pin = createPin(el);
+
+      pin.addEventListener("click", onMapPinClick);
+
       // append DOM element to frag
       fragment.appendChild(pin);
     });
@@ -193,7 +214,7 @@ var renderPins = function() {
   }
 }
 
-// change page settings at start
+// change inactive page settings at start
 var startupSettings = function() {
   var adForm = document.querySelector(".ad-form");
   var filtersForm = document.querySelector(".map__filters");
