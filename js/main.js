@@ -21,6 +21,8 @@ var MAP_WIDTH = document.querySelector(".map__pins").clientWidth;
 var MAP_HEIGHT = document.querySelector(".map__pins").clientHeight;
 var MAP_PIN_WIDTH = 50;
 var MAP_PIN_HEIGHT = 70;
+var CARD_WIDTH = 230;
+var FILTERS_HEIGHT = 46;
 
 
 // UTILITY Functions
@@ -66,9 +68,6 @@ var renderPins = function() {
   // put map pins on map
   renderMapPins(adverts);
 
-  // render a card
-  renderCard(adverts[0]);
-
   // FUNCTIONS
   // generate random advert object
   function generateAdvert(id) {
@@ -92,8 +91,8 @@ var renderPins = function() {
           "photos": generateRandomLengthArray(PHOTOS, generateRandomNumber(0, 10))
       },
       "location": {
-          "x": xAddress - 25,
-          "y": yAddress - 70
+          "x": xAddress,
+          "y": yAddress
       }
     };
     return advert;
@@ -113,8 +112,8 @@ var renderPins = function() {
       .querySelector("button")
       .cloneNode(true);
     var avatar = btn.querySelector("img");
-    btn.style.left = advert.location.x + "px";
-    btn.style.top = advert.location.y + "px";
+    btn.style.left = advert.location.x - 25 + "px";
+    btn.style.top = advert.location.y - 70 + "px";
     avatar.src = advert.author.avatar;
     avatar.alt = advert.offer.title;
     return btn;
@@ -134,7 +133,6 @@ var renderPins = function() {
     var card = createCard(pinAdvert);
     // 3. render pin's card DOM element
     renderCard(card);
-    console.log(card);
   }
 
   // render map pins DOM elements on map from array
@@ -144,7 +142,7 @@ var renderPins = function() {
     arr.forEach(function (el) {
       // create pin DOM element with object data
       var pin = createPin(el);
-
+      // add pin click handler
       pin.addEventListener("click", onMapPinClick);
 
       // append DOM element to frag
@@ -169,6 +167,7 @@ var renderPins = function() {
     var photos = card.querySelector(".popup__photos");
     var photo = photos.querySelector("img");
     var avatar = card.querySelector(".popup__avatar");
+    var closeBtn = card.querySelector(".popup__close");
 
     title.textContent = advert.offer.title;
     address.textContent = advert.offer.address;
@@ -192,25 +191,65 @@ var renderPins = function() {
     utilities.textContent = advert.offer.features.join(", ");
     description.textContent = advert.offer.description;
     avatar.src = advert.author.avatar;
-    advert.offer.photos.forEach(function(el) {
+    // append photos to DOM element
+    advert.offer.photos.forEach(function(photoSrc) {
       var newPhoto = photo.cloneNode(false);
-      newPhoto.src = el;
+      newPhoto.src = photoSrc;
       photos.appendChild(newPhoto);
     });
+    // delete template photo
     photo.remove();
+
+    // height of each card depends on it's data
+    // to get the correct height we need to
+    // mock render card with hidden visibility
+    var findRenderedCardHeight = function(card) {
+      var map = document.querySelector(".map");
+      card.style.visibility = "hidden";
+      map.appendChild(card);
+      var cardHeight = card.offsetHeight;
+      card.remove();
+      card.style.visibility = "visible";
+      return cardHeight;
+    }
+
+    // set card's X and Y coordinates and prevent X and Y overflow
+    var setCardLocation = function(card) {
+      var cardHeight = findRenderedCardHeight(card);
+        debugger;
+      if (advert.location.x + CARD_WIDTH > MAP_WIDTH) {
+        card.style.left = advert.location.x + (MAP_WIDTH - (advert.location.x + CARD_WIDTH)) + "px";
+      } else {
+        card.style.left = advert.location.x + "px";
+      }
+      if (advert.location.y + cardHeight > MAP_HEIGHT - FILTERS_HEIGHT) {
+        console.log("overflow Y");
+        card.style.top = advert.location.y + (MAP_HEIGHT - (advert.location.y + cardHeight)) + "px";
+      } else {
+        card.style.top = advert.location.y + "px";
+      }
+      return card;
+    }
+    // set style.left and style.top
+    card = setCardLocation(card);
+
+    // remove card from DOM on "close button" click
+    closeBtn.addEventListener("click", function() {
+      card.remove();
+    });
 
     return card;
   };
   // render card DOM element on map
-  function renderCard(advert) {
-    var card = createCard(advert);
-    var fragment = document.createDocumentFragment();
+  function renderCard(createdCard) {
     var map = document.querySelector(".map");
     var mapFilters = map.querySelector(".map__filters-container");
-
-    fragment.appendChild(card);
-
-    map.insertBefore(fragment, mapFilters);
+    // find other opened popup (if any)
+    var otherCard = map.querySelector(".popup")
+    // remove other card from DOM (if it exists)
+    if (otherCard) otherCard.remove();
+    // insert card DOM element before mapFilters
+    map.insertBefore(createdCard, mapFilters);
   }
 }
 
