@@ -121,7 +121,7 @@ var renderPins = function() {
   // click handler for map pins (not Main Pin)
   function onMapPinClick(evt) {
     // 1. find pin's advert
-    var pinAvatarSrc = this.querySelector("img").src;
+    var pinAvatarSrc = evt.currentTarget.querySelector("img").src;
     // edit src into "user##" format where "##" are numbers
     var pinUserId = pinAvatarSrc.match(/user\w+(?=.png)/)[0];
     // find an advert with the same user id as pin's
@@ -144,6 +144,10 @@ var renderPins = function() {
       var pin = createPin(el);
       // add pin click handler
       pin.addEventListener("click", onMapPinClick);
+      pin.addEventListener("keydown", function(evt) {
+        if (evt.keyCode !== 13) return;
+        onMapPinClick(evt);
+      });
 
       // append DOM element to frag
       fragment.appendChild(pin);
@@ -191,6 +195,7 @@ var renderPins = function() {
     utilities.textContent = advert.offer.features.join(", ");
     description.textContent = advert.offer.description;
     avatar.src = advert.author.avatar;
+
     // append photos to DOM element
     advert.offer.photos.forEach(function(photoSrc) {
       var newPhoto = photo.cloneNode(false);
@@ -215,26 +220,33 @@ var renderPins = function() {
 
     // set card's X and Y coordinates and prevent X and Y overflow
     var setCardLocation = function(card) {
+      // get rendered card height
       var cardHeight = findRenderedCardHeight(card);
-        debugger;
+      // find if card overflows in X coordinate
       if (advert.location.x + CARD_WIDTH > MAP_WIDTH) {
         card.style.left = advert.location.x + (MAP_WIDTH - (advert.location.x + CARD_WIDTH)) + "px";
       } else {
         card.style.left = advert.location.x + "px";
       }
+      // find if card overflows in Y coordinate
       if (advert.location.y + cardHeight > MAP_HEIGHT - FILTERS_HEIGHT) {
-        console.log("overflow Y");
         card.style.top = advert.location.y + (MAP_HEIGHT - (advert.location.y + cardHeight)) + "px";
       } else {
         card.style.top = advert.location.y + "px";
       }
       return card;
     }
+
     // set style.left and style.top
     card = setCardLocation(card);
 
     // remove card from DOM on "close button" click
     closeBtn.addEventListener("click", function() {
+      card.remove();
+    });
+    // remove card from DOM on "escape" press
+    document.addEventListener("keydown", function(evt) {
+      if (evt.keyCode !== 27) return;
       card.remove();
     });
 
