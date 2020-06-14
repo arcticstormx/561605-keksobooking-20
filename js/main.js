@@ -323,63 +323,91 @@ var startupSettings = function() {
 
 startupSettings();
 
-// validate that guests number conforms to rooms capacity
-var roomsToCapacityValidation = function() {
-  // валидация соответствия количества комнат количеству гостей
+var validation = function() {
+  // EXECUTED CODE
+  roomsToCapacityValidation();
+  typeToPriceValidation();
 
-  var roomNumber = document.querySelector("#room_number");
-  var capacity = document.querySelector("#capacity");
+  // validate that guests number conforms to rooms capacity
+  function roomsToCapacityValidation() {
+    // валидация соответствия количества комнат количеству гостей
 
-  var enableCapacityOptions = function() {
-    var capacityOptions = document.querySelectorAll("#capacity option");
-    capacityOptions.forEach(function(el) {
-      el.disabled = false;
-    })
+    var roomNumber = document.querySelector("#room_number");
+    var capacity = document.querySelector("#capacity");
+
+    var enableCapacityOptions = function() {
+      var capacityOptions = document.querySelectorAll("#capacity option");
+      capacityOptions.forEach(function(el) {
+        el.disabled = false;
+      })
+    }
+
+    roomNumber.addEventListener("change", function(evt) {
+      enableCapacityOptions();
+      var roomsValue = evt.target.value;
+      var capacityOptions = capacity.querySelectorAll("option");
+      var oneGuestCapacity = capacity.querySelector("option[value='1']");
+      capacityOptions.forEach(function(el) {
+        if (roomsValue == "100") {
+          if (el.value == "0") {
+            el.selected = true;
+            return;
+          }
+          el.disabled = true;
+
+
+        } else if (roomsValue == "1") {
+          if (el.value == "1") {
+            oneGuestCapacity.selected = true;
+            return;
+          }
+          el.disabled = true;
+
+        } else if (roomsValue == "2") {
+          if (el.value == "1" || el.value == "2") {
+            oneGuestCapacity.selected = true;
+            return;
+          }
+          el.disabled = true;
+
+
+        } else if (roomsValue == "3") {
+          if (el.value == "1" || el.value == "2" || el.value == "3") {
+            oneGuestCapacity.selected = true;
+            return;
+          }
+          el.disabled = true;
+        }
+      });
+    });
   }
+  // validate apartments type to price
+  function typeToPriceValidation() {
+    var type = document.querySelector("#type");
+    var price = document.querySelector("#price");
 
-  roomNumber.addEventListener("change", function(evt) {
-    enableCapacityOptions();
-    var roomsValue = evt.target.value;
-    var capacityOptions = capacity.querySelectorAll("option");
-    var oneGuestCapacity = capacity.querySelector("option[value='1']");
-    capacityOptions.forEach(function(el) {
-      if (roomsValue == "100") {
-        if (el.value == "0") {
-          el.selected = true;
-          return;
-        }
-        el.disabled = true;
-
-
-      } else if (roomsValue == "1") {
-        if (el.value == "1") {
-          oneGuestCapacity.selected = true;
-          return;
-        }
-        el.disabled = true;
-
-      } else if (roomsValue == "2") {
-        if (el.value == "1" || el.value == "2") {
-          oneGuestCapacity.selected = true;
-          return;
-        }
-        el.disabled = true;
-
-
-      } else if (roomsValue == "3") {
-        if (el.value == "1" || el.value == "2" || el.value == "3") {
-          oneGuestCapacity.selected = true;
-          return;
-        }
-        el.disabled = true;
+    type.addEventListener("change", function(evt) {
+      switch (evt.target.value) {
+        case "bungalo":
+          price.min = 0;
+          price.placeholder = "0";
+          break;
+        case "flat":
+          price.min = 1000;
+          price.placeholder = "1000";
+          break;
+        case "house":
+          price.min = 5000;
+          price.placeholder = "5000";
+          break;
+        case "palace":
+          price.min = 10000;
+          price.placeholder = "10000";
+          break;
       }
     });
-  });
+  }
 }
-
-roomsToCapacityValidation();
-
-// open
-
+validation();
 
 })();
