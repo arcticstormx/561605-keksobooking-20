@@ -24,15 +24,20 @@ var MAP_PIN_HEIGHT = 70;
 
 
 // UTILITY Functions
+
+// generate a random number width specified minimum and maximum limits
 var generateRandomNumber = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
+// get random element from a specified array
 var getRandomElement = function(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 };
+// shuffle a specified array
 var shuffleArray = function(arr) {
   return arr.sort(function() { return Math.random() - 0.5 });
 };
+// generate array with specified length from random elements of a specified array
 var generateRandomLengthArray = function(arr, randomLength) {
   var newArr = [];
   for (var i = 0; i < randomLength - 1; i++) {
@@ -40,6 +45,7 @@ var generateRandomLengthArray = function(arr, randomLength) {
   }
   return newArr;
 };
+// generate array with number sequence as elements
 var generateNumberArray = function(startNum, endNum) {
   var arr = [];
   for (var i = 0; i <= endNum; i++) {
@@ -50,8 +56,20 @@ var generateNumberArray = function(startNum, endNum) {
 
 // Create adverts and pins
 var renderPins = function() {
+  // EXECUTED CODE
+
+  // declare adverts array variable
+  var adverts = createRandomAdvertsArray(8);
+
+  // put map pins on map
+  renderMapPins(adverts);
+
+  // render a card
+  renderCard(adverts[0]);
+
+  // FUNCTIONS
   // generate random advert object
-  var generateAdvert = function(id) {
+  function generateAdvert(id) {
     var xAddress = generateRandomNumber(MAP_PIN_WIDTH / 2, MAP_WIDTH - (MAP_PIN_WIDTH / 2));
     var yAddress = generateRandomNumber(MAP_HEADER_HEIGHT, MAP_HEIGHT);
     var advert = {
@@ -78,8 +96,16 @@ var renderPins = function() {
     };
     return advert;
   };
+  // create adverts array from generated adverts
+  function createRandomAdvertsArray(arrLength) {
+    var arr = [];
+    for (var i = 0; i < arrLength; i++) {
+      arr.push(generateAdvert([i + 1]));
+    }
+    return arr;
+  }
   // create map pin DOM element
-  var createPin = function(advert) {
+  function createPin(advert) {
     var btn = document.querySelector("#pin")
       .content
       .querySelector("button")
@@ -91,33 +117,21 @@ var renderPins = function() {
     avatar.alt = advert.offer.title;
     return btn;
   };
-
-  // create mock adverts and add pins on map
-  var generateAdvertsArray = function(arrLength) {
-    var arr = [];
-    for (var i = 0; i < arrLength; i++) {
-      arr.push(generateAdvert([i + 1]));
-    }
-    return arr;
-  }
-  // render map pins on map from array
-  var renderMapPins = function(arr) {
+  // render map pins DOM elements on map from array
+  function renderMapPins(arr) {
     var fragment = document.createDocumentFragment();
     var mapPins = document.querySelector(".map__pins");
     arr.forEach(function (el) {
+      // create pin DOM element with object data
       var pin = createPin(el);
+      // append DOM element to frag
       fragment.appendChild(pin);
     });
+    // put pin DOM elements on map
     mapPins.appendChild(fragment);
   }
-  var adverts = generateAdvertsArray(8);
-
-  renderMapPins(adverts);
-
-
-  //// create mock cards
-
-  var createCard = function(advert) {
+  // create card DOM element from object
+  function createCard(advert) {
     var cardTemplate = document.querySelector("#card").content;
     var card = cardTemplate.querySelector("article").cloneNode(true);
 
@@ -164,127 +178,133 @@ var renderPins = function() {
 
     return card;
   };
+  // render card DOM element on map
+  function renderCard(advert) {
+    var card = createCard(advert);
+    var fragment = document.createDocumentFragment();
+    var map = document.querySelector(".map");
+    var mapFilters = map.querySelector(".map__filters-container");
 
+    fragment.appendChild(card);
 
-  // создать объявления
-
-  var card = createCard(adverts[0]);
-  var cardFrag = document.createDocumentFragment();
-  var map = document.querySelector(".map");
-  var mapFilters = map.querySelector(".map__filters-container");
-
-  cardFrag.appendChild(card);
-
-  map.insertBefore(cardFrag, mapFilters);
+    map.insertBefore(fragment, mapFilters);
+  }
 }
 
 
 // 4 глава Обработка событий
+// change page settings at start
+var startupSettings = function() {
+  var adForm = document.querySelector(".ad-form");
+  var filtersForm = document.querySelector(".map__filters");
+  var adFieldsets = adForm.children;
+  var filters = filtersForm.children;
 
-var adForm = document.querySelector(".ad-form");
-var adFieldsets = adForm.children;
-var filtersForm = document.querySelector(".map__filters");
-var filters = filtersForm.children;
-
-// отключение всех филдсетов в ad-form
-for (var i = 0; i < adFieldsets.length; i++) {
-  adFieldsets[i].disabled = true;
-}
-
-// отключение всех инпутов в фильтрах
-for (var i = 0; i < filters.length; i++) {
-  filters[i].disabled = true;
-}
-
-// value адреса в неактивном состоянии
-var mainPin = document.querySelector(".map__pin--main");
-var address = document.querySelector("#address");
-
-// первоначальное значение address, когда кнопка круглая
-address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
-
-// активация страницы
-
-var onMainPinClick = function(evt) {
-  var map = document.querySelector(".map");
-  map.classList.remove("map--faded");
-  for (var i = 0; i < filters.length; i++) {
-    filters[i].disabled = false;
-  }
-  for (var i = 0; i < adFieldsets.length; i++) {
-    adFieldsets[i].disabled = false;
-  }
-  adForm.classList.remove("ad-form--disabled");
-  // перенос адреса на остреё пина
-  address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight + 22);
-}
-
-// слушатели главного пина
-var mainPin = document.querySelector(".map__pin--main");
-mainPin.addEventListener("mousedown", function(evt) {
-  if (evt.button !== 0) return;
-  var mapFaded = document.querySelector(".map--faded");
-  if (mapFaded) renderPins();
-  onMainPinClick(evt);
-});
-
-mainPin.addEventListener("keydown", function(evt) {
-  if (evt.keyCode !== 13) return;
-  var mapFaded = document.querySelector(".map--faded");
-  if (mapFaded) renderPins();
-  onMainPinClick(evt);
-});
-
-// валидация соответствия количества комнат количеству гостей
-var roomNumber = document.querySelector("#room_number");
-var capacity = document.querySelector("#capacity");
-
-var enableCapacityOptions = function() {
-  var capacityOptions = document.querySelectorAll("#capacity option");
-  capacityOptions.forEach(function(el) {
-    el.disabled = false;
-  })
-}
-
-roomNumber.addEventListener("change", function(evt) {
-  enableCapacityOptions();
-  var roomsValue = evt.target.value;
-  var capacityOptions = capacity.querySelectorAll("option");
-  var oneGuestCapacity = capacity.querySelector("option[value='1']");
-  capacityOptions.forEach(function(el) {
-    if (roomsValue == "100") {
-      if (el.value == "0") {
-        el.selected = true;
-        return;
-      }
-      el.disabled = true;
-
-
-    } else if (roomsValue == "1") {
-      if (el.value == "1") {
-        oneGuestCapacity.selected = true;
-        return;
-      }
-      el.disabled = true;
-
-    } else if (roomsValue == "2") {
-      if (el.value == "1" || el.value == "2") {
-        oneGuestCapacity.selected = true;
-        return;
-      }
-      el.disabled = true;
-
-
-    } else if (roomsValue == "3") {
-      if (el.value == "1" || el.value == "2" || el.value == "3") {
-        oneGuestCapacity.selected = true;
-        return;
-      }
-      el.disabled = true;
+  // disable all elements in collection/array/list
+  var toggleDisableElements = function(iterableElements, boolean) {
+    for (var i = 0; i < iterableElements.length; i++) {
+      iterableElements[i].disabled = boolean;
     }
-  });
-});
+  }
+  // disable map filters
+  toggleDisableElements(filters, true);
+  // disable ad form
+  toggleDisableElements(adFieldsets, true);
 
+  // value адреса в неактивном состоянии
+  var mainPin = document.querySelector(".map__pin--main");
+  var address = document.querySelector("#address");
+
+  // первоначальное значение address, когда кнопка круглая
+  address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
+  // активация страницы
+  var onMainPinClick = function(evt) {
+    var map = document.querySelector(".map");
+    map.classList.remove("map--faded");
+
+    // enable map filters
+    toggleDisableElements(filters, false);
+    // enable ad form
+    toggleDisableElements(adFieldsets, false);
+
+    adForm.classList.remove("ad-form--disabled");
+    // перенос адреса на остреё пина
+    address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ", " + Math.round(mainPin.offsetTop + mainPin.offsetHeight + 22);
+  }
+
+  // слушатели главного пина
+  var mainPin = document.querySelector(".map__pin--main");
+  mainPin.addEventListener("mousedown", function(evt) {
+    if (evt.button !== 0) return;
+    var mapFaded = document.querySelector(".map--faded");
+    if (mapFaded) renderPins();
+    onMainPinClick(evt);
+  });
+
+  mainPin.addEventListener("keydown", function(evt) {
+    if (evt.keyCode !== 13) return;
+    var mapFaded = document.querySelector(".map--faded");
+    if (mapFaded) renderPins();
+    onMainPinClick(evt);
+  });
+}
+
+startupSettings();
+
+var roomsToCapacityValidation = function() {
+  // валидация соответствия количества комнат количеству гостей
+
+  var roomNumber = document.querySelector("#room_number");
+  var capacity = document.querySelector("#capacity");
+
+  var enableCapacityOptions = function() {
+    var capacityOptions = document.querySelectorAll("#capacity option");
+    capacityOptions.forEach(function(el) {
+      el.disabled = false;
+    })
+  }
+
+  roomNumber.addEventListener("change", function(evt) {
+    enableCapacityOptions();
+    var roomsValue = evt.target.value;
+    var capacityOptions = capacity.querySelectorAll("option");
+    var oneGuestCapacity = capacity.querySelector("option[value='1']");
+    capacityOptions.forEach(function(el) {
+      if (roomsValue == "100") {
+        if (el.value == "0") {
+          el.selected = true;
+          return;
+        }
+        el.disabled = true;
+
+
+      } else if (roomsValue == "1") {
+        if (el.value == "1") {
+          oneGuestCapacity.selected = true;
+          return;
+        }
+        el.disabled = true;
+
+      } else if (roomsValue == "2") {
+        if (el.value == "1" || el.value == "2") {
+          oneGuestCapacity.selected = true;
+          return;
+        }
+        el.disabled = true;
+
+
+      } else if (roomsValue == "3") {
+        if (el.value == "1" || el.value == "2" || el.value == "3") {
+          oneGuestCapacity.selected = true;
+          return;
+        }
+        el.disabled = true;
+      }
+    });
+  });
+}
+
+roomsToCapacityValidation();
 
 // Открытие любой карточки по клику
 
