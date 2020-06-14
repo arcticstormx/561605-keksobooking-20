@@ -73,6 +73,7 @@ var renderPins = function() {
   function generateAdvert(id) {
     var xAddress = generateRandomNumber(MAP_PIN_WIDTH / 2, MAP_WIDTH - (MAP_PIN_WIDTH / 2));
     var yAddress = generateRandomNumber(MAP_HEADER_HEIGHT, MAP_HEIGHT);
+    var time = getRandomElement(TIMES);
     var advert = {
       "author": {
           "avatar": "img/avatars/user0" + id + ".png"
@@ -84,8 +85,8 @@ var renderPins = function() {
           "type": getRandomElement(PLACES),
           "rooms": generateRandomNumber(1, 5),
           "guests": generateRandomNumber(1, 4),
-          "checkin": getRandomElement(TIMES),
-          "checkout": getRandomElement(TIMES),
+          "checkin": time,
+          "checkout": time,
           "features": shuffleArray(UTILITIES).splice(0, generateRandomNumber(0, 5)),
           "description": null,
           "photos": generateRandomLengthArray(PHOTOS, generateRandomNumber(0, 10))
@@ -327,6 +328,7 @@ var validation = function() {
   // EXECUTED CODE
   roomsToCapacityValidation();
   typeToPriceValidation();
+  timeinToTimeoutValidation()
 
   // validate that guests number conforms to rooms capacity
   function roomsToCapacityValidation() {
@@ -403,6 +405,37 @@ var validation = function() {
         case "palace":
           price.min = 10000;
           price.placeholder = "10000";
+          break;
+      }
+    });
+  }
+  function timeinToTimeoutValidation() {
+    var timein = document.querySelector("#timein");
+    var timeout = document.querySelector("#timeout");
+
+    timein.addEventListener("change", function(evt) {
+      switch (evt.target.value) {
+        case "12:00":
+          timeout.value = "12:00";
+          break;
+        case "13:00":
+          timeout.value = "13:00";
+          break;
+        case "14:00":
+          timeout.value = "14:00";
+          break;
+      }
+    });
+    timeout.addEventListener("change", function(evt) {
+      switch (evt.target.value) {
+        case "12:00":
+          timein.value = "12:00";
+          break;
+        case "13:00":
+          timein.value = "13:00";
+          break;
+        case "14:00":
+          timein.value = "14:00";
           break;
       }
     });
