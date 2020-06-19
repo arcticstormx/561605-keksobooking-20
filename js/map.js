@@ -29,10 +29,20 @@
     }
     };
 
-    var adverts = window.data.createRandomAdvertsArray(8);
+    var adverts;
+    var onError = function (message) {
+      console.error(message);
+    };
+    var onSuccess = function (data) {
+      console.log(data);
+      adverts = data;
+      renderMapPins(adverts);
+    };
+    window.load('https://javascript.pages.academy/keksobooking/data', onSuccess, onError);
+
+    // var adverts = window.data.createRandomAdvertsArray(8);
 
     // put map pins on map
-    renderMapPins(adverts);
 
     // FUNCTIONS
     // create map pin DOM element
