@@ -146,8 +146,6 @@
       toggleDisableElements(adFieldsets, false);
 
       adForm.classList.remove('ad-form--disabled');
-      // перенос адреса на остреё пина
-      address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ', ' + Math.round(mainPin.offsetTop + mainPin.offsetHeight + 22);
     };
 
     // слушатели главного пина
