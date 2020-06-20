@@ -33,6 +33,42 @@
       var arr = []; for (var i = 0; i <= endNum; i++) {
         arr.push(i);
       } return arr;
+    },
+    // reset page to inactive state
+    resetPage: function resetPage() {
+      var form = document.querySelector(".ad-form");
+      var filtersForm = document.querySelector('.map__filters');
+      var adFieldsets = form.children;
+      var filters = filtersForm.children;
+      // 1. reset form data
+      form.reset();
+      // 2. disable all inputs
+      var toggleDisableElements = function (iterableElements, boolean) {
+        for (var i = 0; i < iterableElements.length; i++) {
+          iterableElements[i].disabled = boolean;
+        }
+      };
+      // disable map filters
+      toggleDisableElements(filters, true);
+      // disable ad form
+      toggleDisableElements(adFieldsets, true);
+      // 3. delete map pins
+      var map = document.querySelector('.map');
+      var mapPins = map.querySelectorAll(".map__pin:not(.map__pin--main)");
+      var mapCard = map.querySelector('.map__card');
+      for (var i = 0; i < mapPins.length; i++) {
+        mapPins[i].remove();
+      }
+      // 4. delete open card (if it exists)
+      if (mapCard) mapCard.remove();
+      // 5. add map--faded class to map
+      map.classList.add('map--faded');
+      // 6. add ad-form--disabled class to form
+      form.classList.add('ad-form--disabled');
+      // 7. add address value
+      var mainPin = document.querySelector('.map__pin--main');
+      var address = document.querySelector('#address');
+      address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ', ' + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
     }
 
   };

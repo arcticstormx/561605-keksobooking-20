@@ -1,6 +1,8 @@
 'use strict';
 (function () {
   // EXECUTED CODE
+
+
   roomsToCapacityValidation();
   typeToPriceValidation();
   timeinToTimeoutValidation();
@@ -115,4 +117,21 @@
       }
     });
   }
+
+
+  var form = document.querySelector(".ad-form");
+  var onError = function (message) {
+    console.log(message);
+  };
+  var onSuccess = function (message) {
+    window.util.resetPage();
+    var main = document.querySelector('main');
+    var temp = document.querySelector('#success').content;
+    var successMsg = temp.cloneNode(true);
+    main.appendChild(successMsg);
+  };
+  form.addEventListener('submit', function(evt) {
+    window.upload(new FormData(form), onSuccess, onError);
+    evt.preventDefault();
+  });
 })();
