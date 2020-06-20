@@ -63,11 +63,12 @@
     // 1. find pin's advert
       var pinAvatarSrc = evt.currentTarget.querySelector('img').src;
       // edit src into "user##" format where "##" are numbers
-      var pinUserId = pinAvatarSrc.match(/user\w+(?=.png)/)[0];
+      var pinUserId = pinAvatarSrc.match(/user\w+(?=.png)/);
+      pinUserId ? pinUserId = pinAvatarSrc.match(/user\w+(?=.png)/)[0] : pinUserId = 'default';
       // find an advert with the same user id as pin's
       var pinAdvert = adverts.find(function (item) {
-        var advertUserId = item.author.avatar.match(/user\w+(?=.png)/)[0];
-        return advertUserId === pinUserId;
+        var advertUserId = item.author.avatar.match(/\w+(?=.png)/);
+        return advertUserId[0] === pinUserId;
       });
       // 2. create pin's card DOM element
       var card = window.card.createFrom(pinAdvert);
