@@ -1,32 +1,49 @@
+// module7-task1
+//
+// 1. Связать "активацию" фильтра с успешной загрузкой
+// 2. Реализовать фильтрацию
+  // 2.1 Создаём копию массива
+  // 2.2 Каждый инпут фильтра фильтрует и меняет копию массива
+  // 2.3 Таким образом, каждый инпут обновляет массив
+  // 2.4 Всегда выводится 5 элементов, даже если в отфильтрованном массиве их меньше
+  // 2.5 Если элементов в массиве меньше 5, то к нему пушатся элементы из первоначального массива
+  // ?? Как избежать дублирования элементов?
+
+
+
 'use strict';
 (function () {
   // create and render adverts and pins
   var renderPins = function () {
-  // EXECUTED CODE
-  // declare adverts array variable
+    // EXECUTED CODE
+    // declare adverts array variable
 
     window.map = {
       renderMapPins: function renderMapPins(advertsArray) {
-      var fragment = document.createDocumentFragment();
-      var mapPins = document.querySelector('.map__pins');
-      advertsArray.forEach(function (el) {
-      // create pin DOM element with object data
-        var pin = createPin(el);
-        // add pin click handler
-        pin.addEventListener('click', onMapPinClick);
-        pin.addEventListener('keydown', function (evt) {
-          if (evt.keyCode !== 13) {
-            return;
-          }
-          onMapPinClick(evt);
-        });
+        var fragment = document.createDocumentFragment();
+        var mapPins = document.querySelector('.map__pins');
 
-        // append DOM element to frag
-        fragment.appendChild(pin);
-      });
-      // put pin DOM elements on map
-      mapPins.appendChild(fragment);
-    }
+        // // Делегирование //
+        // mapPins.addEventListener('click', )
+
+        advertsArray.forEach(function (el) {
+        // create pin DOM element with object data
+          var pin = createPin(el);
+          // add pin click handler
+          pin.addEventListener('click', onMapPinClick);
+          pin.addEventListener('keydown', function (evt) {
+            if (evt.keyCode !== 13) {
+              return;
+            }
+            onMapPinClick(evt);
+          });
+
+          // append DOM element to frag
+          fragment.appendChild(pin);
+        });
+        // put pin DOM elements on map
+        mapPins.appendChild(fragment);
+      }
     };
 
     var adverts;
@@ -60,7 +77,7 @@
     }
     // click handler for map pins (not Main Pin)
     function onMapPinClick(evt) {
-    // 1. find pin's advert
+      // 1. find pin's advert
       var pinAvatarSrc = evt.currentTarget.querySelector('img').src;
       // edit src into "user##" format where "##" are numbers
       var pinUserId = pinAvatarSrc.match(/user\w+(?=.png)/);
@@ -135,9 +152,15 @@
 
     // первоначальное значение address, когда кнопка круглая
     address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ', ' + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
+
+    // слушатели главного пина
+    var mainPin = document.querySelector('.map__pin--main');
+    mainPin.addEventListener('mousedown', onMainPinMouseDown);
+    mainPin.addEventListener('keydown', onMainPinKeydown);
     // активация страницы
-    var onMainPinClick = function (evt) {
+    function activatePage() {
       var map = document.querySelector('.map');
+      var adForm = document.querySelector('.ad-form');
       map.classList.remove('map--faded');
 
       // enable map filters
@@ -146,22 +169,10 @@
       toggleDisableElements(adFieldsets, false);
 
       adForm.classList.remove('ad-form--disabled');
+      mainPin.removeEventListener('mousedown', onMainPinKeydown);
+      mainPin.removeEventListener('keydown', onMainPinMouseDown);
     };
-
-    // слушатели главного пина
-    var mainPin = document.querySelector('.map__pin--main');
-    mainPin.addEventListener('mousedown', function (evt) {
-      if (evt.button !== 0) {
-        return;
-      }
-      var mapFaded = document.querySelector('.map--faded');
-      if (mapFaded) {
-        renderPins();
-      }
-      onMainPinClick(evt);
-    });
-
-    mainPin.addEventListener('keydown', function (evt) {
+    function onMainPinKeydown(evt) {
       if (evt.keyCode !== 13) {
         return;
       }
@@ -169,8 +180,18 @@
       if (mapFaded) {
         renderPins();
       }
-      onMainPinClick(evt);
-    });
+      activatePage();
+    };
+    function onMainPinMouseDown(evt) {
+      if (evt.button !== 0) {
+        return;
+      }
+      var mapFaded = document.querySelector('.map--faded');
+      if (mapFaded) {
+        renderPins();
+      }
+      activatePage();
+    };
   };
 
   startupSettings();

@@ -70,6 +70,5 @@
       var address = document.querySelector('#address');
       address.value = Math.round(mainPin.offsetLeft + mainPin.offsetWidth / 2) + ', ' + Math.round(mainPin.offsetTop + mainPin.offsetHeight / 2);
     }
-
   };
 })();
