@@ -123,7 +123,7 @@
   function formSubmission() {
     var form = document.querySelector(".ad-form");
     form.addEventListener('submit', function(evt) {
-      window.upload(new FormData(form), onSuccess, onError);
+      window.data.post(new FormData(form), onSuccess, onError);
       evt.preventDefault();
     });
     var resetBtn = document.querySelector('.ad-form__reset');

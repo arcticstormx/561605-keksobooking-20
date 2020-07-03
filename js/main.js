@@ -1,4 +1,7 @@
 (function () {
+  // set page settings
+  window.map.setPageStartupSettings();
+
   // var onError = function (message) {
   //   console.error(message);
   // };
