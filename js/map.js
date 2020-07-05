@@ -60,7 +60,7 @@
         }
         var mapFaded = document.querySelector('.map--faded');
         if (mapFaded) {
-          window.map.renderPins();
+          getAdvertsData();
         }
         activatePage();
       };
@@ -70,29 +70,29 @@
         }
         var mapFaded = document.querySelector('.map--faded');
         if (mapFaded) {
-          window.map.renderPins();
+          getAdvertsData();
         }
         activatePage();
       };
-    },
-    // create and render adverts and pins
-    renderPins: function () {
-      // EXECUTED CODE
-      // declare adverts array variable
-      var adverts;
-      var onError = function (message) {
-        console.error(message);
-      };
-      var onSuccess = function (data) {
-        console.log(data);
-        adverts = data;
-        renderMapPins(adverts);
-      };
-      // load adverts data
-      window.data.get('https://javascript.pages.academy/keksobooking/data', onSuccess, onError);
     }
   };
   // FUNCTIONS
+  // get adverts data object
+  function getAdvertsData() {
+    // EXECUTED CODE
+    // declare adverts array variable
+    var adverts;
+    var onError = function (message) {
+      console.error(message);
+    };
+    var onSuccess = function (data) {
+      console.log(data);
+      adverts = data;
+      renderMapPins(adverts);
+    };
+    // load adverts data
+    window.data.get('https://javascript.pages.academy/keksobooking/data', onSuccess, onError);
+  }
   // disable all elements in collection/array/list
   function toggleDisableElements (iterableElements, boolean) {
     for (var i = 0; i < iterableElements.length; i++) {
@@ -164,8 +164,4 @@
     // insert card DOM element before mapFilters
     map.insertBefore(createdCard, mapFilters);
   };
-
-
-
-
 })();

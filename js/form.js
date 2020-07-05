@@ -2,7 +2,6 @@
 (function () {
   // EXECUTED CODE
 
-
   roomsToCapacityValidation();
   typeToPriceValidation();
   timeinToTimeoutValidation();
